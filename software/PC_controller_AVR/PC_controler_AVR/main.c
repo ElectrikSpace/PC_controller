@@ -2,7 +2,7 @@
  * PC_controler_AVR.c
  *
  * Created: 14/11/2019 21:28:41
- * Author : sylvain
+ * Author : ElectrikSpace
  */ 
 #define F_CPU (1200000UL) // 1.2 MHz
 
