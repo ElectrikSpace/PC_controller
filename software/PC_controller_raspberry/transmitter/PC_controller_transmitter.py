@@ -24,7 +24,9 @@ HC12.write("AT+FU3")
 time.sleep(0.05)
 GPIO.output(12, GPIO.HIGH)
 time.sleep(0.05)
-HC12.write(command)
+for i in range(120) : #on envoie 120 messages
+    HC12.write(command)
+    time.sleep(0.25) #espacés de 250 ms
 
 #enter HC12 into low consumption mode
 time.sleep(0.05)
