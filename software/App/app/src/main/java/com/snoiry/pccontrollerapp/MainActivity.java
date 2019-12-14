@@ -9,7 +9,7 @@ import android.widget.ImageButton;
 public class MainActivity extends AppCompatActivity {
 
     private ImageButton power_button;
-    private ImageButton reset_button
+    private ImageButton reset_button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
