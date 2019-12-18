@@ -3,31 +3,31 @@ PC_controler_AVR.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         00000216  00000000  00000000  00000074  2**1
+  0 .text         0000024c  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .data         00000000  00800060  00800060  0000028a  2**0
+  1 .data         00000000  00800060  00800060  000002c0  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  2 .bss          00000023  00800060  00800060  0000028a  2**0
+  2 .bss          00000023  00800060  00800060  000002c0  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  0000028a  2**0
+  3 .comment      00000030  00000000  00000000  000002c0  2**0
                   CONTENTS, READONLY
-  4 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000002bc  2**2
+  4 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000002f0  2**2
                   CONTENTS, READONLY
-  5 .debug_aranges 00000048  00000000  00000000  000002f8  2**0
+  5 .debug_aranges 00000050  00000000  00000000  0000032c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   000006a4  00000000  00000000  00000340  2**0
+  6 .debug_info   000006d6  00000000  00000000  0000037c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00000498  00000000  00000000  000009e4  2**0
+  7 .debug_abbrev 00000498  00000000  00000000  00000a52  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   000003d9  00000000  00000000  00000e7c  2**0
+  8 .debug_line   0000041a  00000000  00000000  00000eea  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  00000094  00000000  00000000  00001258  2**2
+  9 .debug_frame  000000c4  00000000  00000000  00001304  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00000337  00000000  00000000  000012ec  2**0
+ 10 .debug_str    00000339  00000000  00000000  000013c8  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00000264  00000000  00000000  00001623  2**0
+ 11 .debug_loc    0000031b  00000000  00000000  00001701  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000078  00000000  00000000  00001887  2**0
+ 12 .debug_ranges 00000080  00000000  00000000  00001a1c  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -36,12 +36,12 @@ Disassembly of section .text:
    0:	09 c0       	rjmp	.+18     	; 0x14 <__ctors_end>
    2:	21 c0       	rjmp	.+66     	; 0x46 <__bad_interrupt>
    4:	20 c0       	rjmp	.+64     	; 0x46 <__bad_interrupt>
-   6:	48 c0       	rjmp	.+144    	; 0x98 <__vector_3>
+   6:	54 c0       	rjmp	.+168    	; 0xb0 <__vector_3>
    8:	1e c0       	rjmp	.+60     	; 0x46 <__bad_interrupt>
    a:	1d c0       	rjmp	.+58     	; 0x46 <__bad_interrupt>
    c:	1c c0       	rjmp	.+56     	; 0x46 <__bad_interrupt>
    e:	1b c0       	rjmp	.+54     	; 0x46 <__bad_interrupt>
-  10:	1a c0       	rjmp	.+52     	; 0x46 <__bad_interrupt>
+  10:	3b c0       	rjmp	.+118    	; 0x88 <__vector_8>
   12:	19 c0       	rjmp	.+50     	; 0x46 <__bad_interrupt>
 
 00000014 <__ctors_end>:
@@ -54,7 +54,7 @@ Disassembly of section .text:
   1c:	10 e0       	ldi	r17, 0x00	; 0
   1e:	a0 e6       	ldi	r26, 0x60	; 96
   20:	b0 e0       	ldi	r27, 0x00	; 0
-  22:	e6 e1       	ldi	r30, 0x16	; 22
+  22:	ec e4       	ldi	r30, 0x4C	; 76
   24:	f2 e0       	ldi	r31, 0x02	; 2
   26:	02 c0       	rjmp	.+4      	; 0x2c <__do_copy_data+0x10>
   28:	05 90       	lpm	r0, Z+
@@ -76,8 +76,8 @@ Disassembly of section .text:
   3c:	a3 38       	cpi	r26, 0x83	; 131
   3e:	b2 07       	cpc	r27, r18
   40:	e1 f7       	brne	.-8      	; 0x3a <.do_clear_bss_loop>
-  42:	87 d0       	rcall	.+270    	; 0x152 <main>
-  44:	e6 c0       	rjmp	.+460    	; 0x212 <_exit>
+  42:	a1 d0       	rcall	.+322    	; 0x186 <main>
+  44:	01 c1       	rjmp	.+514    	; 0x248 <_exit>
 
 00000046 <__bad_interrupt>:
   46:	dc cf       	rjmp	.-72     	; 0x0 <__vectors>
@@ -120,398 +120,432 @@ void init() {
 }
 
 void go_to_sleep() {
-	// prescale timer to 8s
-	WDTCR |= (1<<WDP3 )|(0<<WDP2 )|(0<<WDP1)|(1<<WDP0); // 8s
-  66:	81 b5       	in	r24, 0x21	; 33
-  68:	81 62       	ori	r24, 0x21	; 33
+	ADCSRA &= ~(1<<ADEN);
+  66:	37 98       	cbi	0x06, 7	; 6
+	WDTCR=(0<<WDTIF) | (0<<WDTIE) | (1<<WDP3) | (1<<WDCE) | (0<<WDE) | (0<<WDP2) | (0<<WDP1) | (1<<WDP0);
+  68:	81 e3       	ldi	r24, 0x31	; 49
   6a:	81 bd       	out	0x21, r24	; 33
-	// Enable watchdog timer interrupts
-	WDTCR |= (1<<WDTIE);
-  6c:	81 b5       	in	r24, 0x21	; 33
-  6e:	80 64       	ori	r24, 0x40	; 64
-  70:	81 bd       	out	0x21, r24	; 33
-	sei(); // Enable global interrupts
-  72:	78 94       	sei
-	// Use the Power Down sleep mode
+	WDTCR=(1<<WDTIF) | (1<<WDTIE) | (1<<WDP3) | (0<<WDCE) | (0<<WDE) | (0<<WDP2) | (0<<WDP1) | (1<<WDP0);
+  6c:	81 ee       	ldi	r24, 0xE1	; 225
+  6e:	81 bd       	out	0x21, r24	; 33
 	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-  74:	85 b7       	in	r24, 0x35	; 53
-  76:	87 7e       	andi	r24, 0xE7	; 231
-  78:	80 61       	ori	r24, 0x10	; 16
-  7a:	85 bf       	out	0x35, r24	; 53
+  70:	85 b7       	in	r24, 0x35	; 53
+  72:	87 7e       	andi	r24, 0xE7	; 231
+  74:	80 61       	ori	r24, 0x10	; 16
+  76:	85 bf       	out	0x35, r24	; 53
+	sleep_enable();
+  78:	85 b7       	in	r24, 0x35	; 53
+  7a:	80 62       	ori	r24, 0x20	; 32
+  7c:	85 bf       	out	0x35, r24	; 53
+	sei();
+  7e:	78 94       	sei
+	sleep_cpu();
+  80:	88 95       	sleep
 	cli();
-  7c:	f8 94       	cli
-  7e:	08 95       	ret
+  82:	f8 94       	cli
+	ADCSRA |= (1<<ADEN);
+  84:	37 9a       	sbi	0x06, 7	; 6
+  86:	08 95       	ret
 
-00000080 <check_battery>:
+00000088 <__vector_8>:
 }
+
+ISR(WDT_vect)
+{
+  88:	1f 92       	push	r1
+  8a:	0f 92       	push	r0
+  8c:	0f b6       	in	r0, 0x3f	; 63
+  8e:	0f 92       	push	r0
+  90:	11 24       	eor	r1, r1
+  92:	8f 93       	push	r24
+	sleep_disable();
+  94:	85 b7       	in	r24, 0x35	; 53
+  96:	8f 7d       	andi	r24, 0xDF	; 223
+  98:	85 bf       	out	0x35, r24	; 53
+}
+  9a:	8f 91       	pop	r24
+  9c:	0f 90       	pop	r0
+  9e:	0f be       	out	0x3f, r0	; 63
+  a0:	0f 90       	pop	r0
+  a2:	1f 90       	pop	r1
+  a4:	18 95       	reti
+
+000000a6 <check_battery>:
 
 char check_battery() {
 	ADCSRA |= (1 << ADSC); // start conversion
-  80:	36 9a       	sbi	0x06, 6	; 6
+  a6:	36 9a       	sbi	0x06, 6	; 6
 	while(ADCSRA & (1 << ADSC)); // wait until complete
-  82:	36 99       	sbic	0x06, 6	; 6
-  84:	fe cf       	rjmp	.-4      	; 0x82 <check_battery+0x2>
-	if(ADC >= min_batterie_level) {
-  86:	84 b1       	in	r24, 0x04	; 4
-  88:	95 b1       	in	r25, 0x05	; 5
-  8a:	85 30       	cpi	r24, 0x05	; 5
-  8c:	93 40       	sbci	r25, 0x03	; 3
-  8e:	10 f4       	brcc	.+4      	; 0x94 <check_battery+0x14>
+  a8:	36 99       	sbic	0x06, 6	; 6
+  aa:	fe cf       	rjmp	.-4      	; 0xa8 <check_battery+0x2>
 		return('y');		
 	}
 	else{
 		return('n');
-  90:	8e e6       	ldi	r24, 0x6E	; 110
-  92:	08 95       	ret
-
-char check_battery() {
-	ADCSRA |= (1 << ADSC); // start conversion
-	while(ADCSRA & (1 << ADSC)); // wait until complete
-	if(ADC >= min_batterie_level) {
-		return('y');		
-  94:	89 e7       	ldi	r24, 0x79	; 121
-	}
-	else{
-		return('n');
-	}
+	}*/
 }
-  96:	08 95       	ret
+  ac:	89 e7       	ldi	r24, 0x79	; 121
+  ae:	08 95       	ret
 
-00000098 <__vector_3>:
+000000b0 <__vector_3>:
 
 ISR(TIM0_OVF_vect)
 {
-  98:	1f 92       	push	r1
-  9a:	0f 92       	push	r0
-  9c:	0f b6       	in	r0, 0x3f	; 63
-  9e:	0f 92       	push	r0
-  a0:	11 24       	eor	r1, r1
-  a2:	8f 93       	push	r24
-  a4:	9f 93       	push	r25
-	timeout+=1;
-  a6:	80 91 7e 00 	lds	r24, 0x007E	; 0x80007e <timeout>
-  aa:	90 91 7f 00 	lds	r25, 0x007F	; 0x80007f <timeout+0x1>
-  ae:	01 96       	adiw	r24, 0x01	; 1
-  b0:	90 93 7f 00 	sts	0x007F, r25	; 0x80007f <timeout+0x1>
-  b4:	80 93 7e 00 	sts	0x007E, r24	; 0x80007e <timeout>
+  b0:	1f 92       	push	r1
+  b2:	0f 92       	push	r0
+  b4:	0f b6       	in	r0, 0x3f	; 63
+  b6:	0f 92       	push	r0
+  b8:	11 24       	eor	r1, r1
+  ba:	8f 93       	push	r24
+  bc:	9f 93       	push	r25
+	 timeout+=1;
+  be:	80 91 7e 00 	lds	r24, 0x007E	; 0x80007e <timeout>
+  c2:	90 91 7f 00 	lds	r25, 0x007F	; 0x80007f <timeout+0x1>
+  c6:	01 96       	adiw	r24, 0x01	; 1
+  c8:	90 93 7f 00 	sts	0x007F, r25	; 0x80007f <timeout+0x1>
+  cc:	80 93 7e 00 	sts	0x007E, r24	; 0x80007e <timeout>
 }
-  b8:	9f 91       	pop	r25
-  ba:	8f 91       	pop	r24
-  bc:	0f 90       	pop	r0
-  be:	0f be       	out	0x3f, r0	; 63
-  c0:	0f 90       	pop	r0
-  c2:	1f 90       	pop	r1
-  c4:	18 95       	reti
+  d0:	9f 91       	pop	r25
+  d2:	8f 91       	pop	r24
+  d4:	0f 90       	pop	r0
+  d6:	0f be       	out	0x3f, r0	; 63
+  d8:	0f 90       	pop	r0
+  da:	1f 90       	pop	r1
+  dc:	18 95       	reti
 
-000000c6 <HC12_read>:
+000000de <HC12_read>:
 
 void HC12_read(){
-  c6:	cf 93       	push	r28
-  c8:	df 93       	push	r29
+  de:	ff 92       	push	r15
+  e0:	0f 93       	push	r16
+  e2:	1f 93       	push	r17
+  e4:	cf 93       	push	r28
+  e6:	df 93       	push	r29
 	timeout = 0;
-  ca:	10 92 7f 00 	sts	0x007F, r1	; 0x80007f <timeout+0x1>
-  ce:	10 92 7e 00 	sts	0x007E, r1	; 0x80007e <timeout>
+  e8:	10 92 7f 00 	sts	0x007F, r1	; 0x80007f <timeout+0x1>
+  ec:	10 92 7e 00 	sts	0x007E, r1	; 0x80007e <timeout>
 	int remain_bytes = total_bytes_message;
-  d2:	ee e1       	ldi	r30, 0x1E	; 30
-  d4:	f0 e0       	ldi	r31, 0x00	; 0
+  f0:	ee e1       	ldi	r30, 0x1E	; 30
+  f2:	f0 e0       	ldi	r31, 0x00	; 0
 		if( !(PINB & (1<<2)) ) { // start bit
 			uint8_t value = 0x00;
-			_delay_us(150); // one and half a period
+			_delay_us(140); // one and half a period
 			for(int index = 0; index <= 7; index++){ // values
 				if(PINB & (1<<2)){
 					value = value | (1<<index);
-  d6:	61 e0       	ldi	r22, 0x01	; 1
-  d8:	70 e0       	ldi	r23, 0x00	; 0
+  f4:	61 e0       	ldi	r22, 0x01	; 1
+  f6:	70 e0       	ldi	r23, 0x00	; 0
 }
 
 void HC12_read(){
 	timeout = 0;
 	int remain_bytes = total_bytes_message;
 	while((timeout<=2000) & (remain_bytes > 0)){
-  da:	31 e0       	ldi	r19, 0x01	; 1
-  dc:	a0 e0       	ldi	r26, 0x00	; 0
-				_delay_us(100); // next bit 9600 HZ
+  f8:	31 e0       	ldi	r19, 0x01	; 1
+  fa:	f1 2c       	mov	r15, r1
+				_delay_us(90); // next bit 9600 HZ
 			}
 			if(PINB & (1<<2)){ // stop bit
 				remain_bytes--;
 				if(remain_bytes == 0) {
 					message[total_bytes_message - remain_bytes] = value;
-  de:	c0 e6       	ldi	r28, 0x60	; 96
-  e0:	d0 e0       	ldi	r29, 0x00	; 0
+  fc:	00 e6       	ldi	r16, 0x60	; 96
+  fe:	10 e0       	ldi	r17, 0x00	; 0
+				else {
+					action = value;
+				}
+				value = 0x00;
+				
+				timeout = 2500;
+ 100:	c4 ec       	ldi	r28, 0xC4	; 196
+ 102:	d9 e0       	ldi	r29, 0x09	; 9
 }
 
 void HC12_read(){
 	timeout = 0;
 	int remain_bytes = total_bytes_message;
 	while((timeout<=2000) & (remain_bytes > 0)){
-  e2:	22 c0       	rjmp	.+68     	; 0x128 <HC12_read+0x62>
+ 104:	28 c0       	rjmp	.+80     	; 0x156 <HC12_read+0x78>
 		if( !(PINB & (1<<2)) ) { // start bit
-  e4:	b2 99       	sbic	0x16, 2	; 22
-  e6:	fe cf       	rjmp	.-4      	; 0xe4 <HC12_read+0x1e>
+ 106:	b2 99       	sbic	0x16, 2	; 22
+ 108:	fe cf       	rjmp	.-4      	; 0x106 <HC12_read+0x28>
 	#else
 		//round up by default
 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
 	#endif
 
 	__builtin_avr_delay_cycles(__ticks_dc);
-  e8:	4c e3       	ldi	r20, 0x3C	; 60
-  ea:	4a 95       	dec	r20
-  ec:	f1 f7       	brne	.-4      	; 0xea <HC12_read+0x24>
+ 10a:	48 e3       	ldi	r20, 0x38	; 56
+ 10c:	4a 95       	dec	r20
+ 10e:	f1 f7       	brne	.-4      	; 0x10c <HC12_read+0x2e>
 			uint8_t value = 0x00;
-			_delay_us(150); // one and half a period
+			_delay_us(140); // one and half a period
 			for(int index = 0; index <= 7; index++){ // values
-  ee:	80 e0       	ldi	r24, 0x00	; 0
-  f0:	90 e0       	ldi	r25, 0x00	; 0
+ 110:	80 e0       	ldi	r24, 0x00	; 0
+ 112:	90 e0       	ldi	r25, 0x00	; 0
 void HC12_read(){
 	timeout = 0;
 	int remain_bytes = total_bytes_message;
 	while((timeout<=2000) & (remain_bytes > 0)){
 		if( !(PINB & (1<<2)) ) { // start bit
 			uint8_t value = 0x00;
-  f2:	20 e0       	ldi	r18, 0x00	; 0
-			_delay_us(150); // one and half a period
+ 114:	20 e0       	ldi	r18, 0x00	; 0
+			_delay_us(140); // one and half a period
 			for(int index = 0; index <= 7; index++){ // values
 				if(PINB & (1<<2)){
-  f4:	b2 9b       	sbis	0x16, 2	; 22
-  f6:	08 c0       	rjmp	.+16     	; 0x108 <HC12_read+0x42>
+ 116:	b2 9b       	sbis	0x16, 2	; 22
+ 118:	08 c0       	rjmp	.+16     	; 0x12a <HC12_read+0x4c>
 					value = value | (1<<index);
-  f8:	ab 01       	movw	r20, r22
-  fa:	08 2e       	mov	r0, r24
-  fc:	02 c0       	rjmp	.+4      	; 0x102 <HC12_read+0x3c>
-  fe:	44 0f       	add	r20, r20
- 100:	55 1f       	adc	r21, r21
- 102:	0a 94       	dec	r0
- 104:	e2 f7       	brpl	.-8      	; 0xfe <HC12_read+0x38>
- 106:	24 2b       	or	r18, r20
- 108:	48 e2       	ldi	r20, 0x28	; 40
- 10a:	4a 95       	dec	r20
- 10c:	f1 f7       	brne	.-4      	; 0x10a <HC12_read+0x44>
- 10e:	00 00       	nop
+ 11a:	ab 01       	movw	r20, r22
+ 11c:	08 2e       	mov	r0, r24
+ 11e:	02 c0       	rjmp	.+4      	; 0x124 <HC12_read+0x46>
+ 120:	44 0f       	add	r20, r20
+ 122:	55 1f       	adc	r21, r21
+ 124:	0a 94       	dec	r0
+ 126:	e2 f7       	brpl	.-8      	; 0x120 <HC12_read+0x42>
+ 128:	24 2b       	or	r18, r20
+ 12a:	a4 e2       	ldi	r26, 0x24	; 36
+ 12c:	aa 95       	dec	r26
+ 12e:	f1 f7       	brne	.-4      	; 0x12c <HC12_read+0x4e>
+ 130:	00 00       	nop
 	int remain_bytes = total_bytes_message;
 	while((timeout<=2000) & (remain_bytes > 0)){
 		if( !(PINB & (1<<2)) ) { // start bit
 			uint8_t value = 0x00;
-			_delay_us(150); // one and half a period
+			_delay_us(140); // one and half a period
 			for(int index = 0; index <= 7; index++){ // values
- 110:	01 96       	adiw	r24, 0x01	; 1
- 112:	88 30       	cpi	r24, 0x08	; 8
- 114:	91 05       	cpc	r25, r1
- 116:	71 f7       	brne	.-36     	; 0xf4 <HC12_read+0x2e>
+ 132:	01 96       	adiw	r24, 0x01	; 1
+ 134:	88 30       	cpi	r24, 0x08	; 8
+ 136:	91 05       	cpc	r25, r1
+ 138:	71 f7       	brne	.-36     	; 0x116 <HC12_read+0x38>
 				if(PINB & (1<<2)){
 					value = value | (1<<index);
 				}
-				_delay_us(100); // next bit 9600 HZ
+				_delay_us(90); // next bit 9600 HZ
 			}
 			if(PINB & (1<<2)){ // stop bit
- 118:	b2 9b       	sbis	0x16, 2	; 22
- 11a:	06 c0       	rjmp	.+12     	; 0x128 <HC12_read+0x62>
+ 13a:	b2 9b       	sbis	0x16, 2	; 22
+ 13c:	0c c0       	rjmp	.+24     	; 0x156 <HC12_read+0x78>
 				remain_bytes--;
- 11c:	31 97       	sbiw	r30, 0x01	; 1
+ 13e:	31 97       	sbiw	r30, 0x01	; 1
 				if(remain_bytes == 0) {
- 11e:	11 f4       	brne	.+4      	; 0x124 <HC12_read+0x5e>
+ 140:	21 f4       	brne	.+8      	; 0x14a <HC12_read+0x6c>
 					message[total_bytes_message - remain_bytes] = value;
- 120:	2e 8f       	std	Y+30, r18	; 0x1e
- 122:	02 c0       	rjmp	.+4      	; 0x128 <HC12_read+0x62>
+ 142:	d8 01       	movw	r26, r16
+ 144:	5e 96       	adiw	r26, 0x1e	; 30
+ 146:	2c 93       	st	X, r18
+ 148:	02 c0       	rjmp	.+4      	; 0x14e <HC12_read+0x70>
 				}
 				else {
 					action = value;
- 124:	20 93 82 00 	sts	0x0082, r18	; 0x800082 <action>
+ 14a:	20 93 82 00 	sts	0x0082, r18	; 0x800082 <action>
+				}
+				value = 0x00;
+				
+				timeout = 2500;
+ 14e:	d0 93 7f 00 	sts	0x007F, r29	; 0x80007f <timeout+0x1>
+ 152:	c0 93 7e 00 	sts	0x007E, r28	; 0x80007e <timeout>
 }
 
 void HC12_read(){
 	timeout = 0;
 	int remain_bytes = total_bytes_message;
 	while((timeout<=2000) & (remain_bytes > 0)){
- 128:	83 2f       	mov	r24, r19
- 12a:	40 91 7e 00 	lds	r20, 0x007E	; 0x80007e <timeout>
- 12e:	50 91 7f 00 	lds	r21, 0x007F	; 0x80007f <timeout+0x1>
- 132:	41 3d       	cpi	r20, 0xD1	; 209
- 134:	57 40       	sbci	r21, 0x07	; 7
- 136:	0c f0       	brlt	.+2      	; 0x13a <HC12_read+0x74>
- 138:	8a 2f       	mov	r24, r26
- 13a:	88 23       	and	r24, r24
- 13c:	39 f0       	breq	.+14     	; 0x14c <HC12_read+0x86>
- 13e:	83 2f       	mov	r24, r19
- 140:	1e 16       	cp	r1, r30
- 142:	1f 06       	cpc	r1, r31
- 144:	0c f0       	brlt	.+2      	; 0x148 <HC12_read+0x82>
- 146:	8a 2f       	mov	r24, r26
- 148:	81 11       	cpse	r24, r1
- 14a:	cc cf       	rjmp	.-104    	; 0xe4 <HC12_read+0x1e>
+ 156:	83 2f       	mov	r24, r19
+ 158:	40 91 7e 00 	lds	r20, 0x007E	; 0x80007e <timeout>
+ 15c:	50 91 7f 00 	lds	r21, 0x007F	; 0x80007f <timeout+0x1>
+ 160:	41 3d       	cpi	r20, 0xD1	; 209
+ 162:	57 40       	sbci	r21, 0x07	; 7
+ 164:	0c f0       	brlt	.+2      	; 0x168 <HC12_read+0x8a>
+ 166:	8f 2d       	mov	r24, r15
+ 168:	88 23       	and	r24, r24
+ 16a:	39 f0       	breq	.+14     	; 0x17a <HC12_read+0x9c>
+ 16c:	83 2f       	mov	r24, r19
+ 16e:	1e 16       	cp	r1, r30
+ 170:	1f 06       	cpc	r1, r31
+ 172:	0c f0       	brlt	.+2      	; 0x176 <HC12_read+0x98>
+ 174:	8f 2d       	mov	r24, r15
+ 176:	81 11       	cpse	r24, r1
+ 178:	c6 cf       	rjmp	.-116    	; 0x106 <HC12_read+0x28>
 			else{
 				// error
 			}
 		}
 	}
 }
- 14c:	df 91       	pop	r29
- 14e:	cf 91       	pop	r28
- 150:	08 95       	ret
+ 17a:	df 91       	pop	r29
+ 17c:	cf 91       	pop	r28
+ 17e:	1f 91       	pop	r17
+ 180:	0f 91       	pop	r16
+ 182:	ff 90       	pop	r15
+ 184:	08 95       	ret
 
-00000152 <main>:
+00000186 <main>:
 
 int main(void)
 {
     init();
- 152:	7a df       	rcall	.-268    	; 0x48 <init>
-			timeout = 0;
-			TCCR0B |= _BV(CS02)|_BV(CS00); // set prescaler to 1024 (CLK=1200000Hz/1024/256=4Hz, 0.25s)
-			TIMSK0 |= _BV(TOIE0); // enable Timer Overflow interrupt
-			sei(); // enable global interrupts
-			while(counter<=500){
-				PORTB = 0x02; //enable HC12
- 154:	12 e0       	ldi	r17, 0x02	; 2
- 156:	ce e7       	ldi	r28, 0x7E	; 126
- 158:	d0 e0       	ldi	r29, 0x00	; 0
-int main(void)
-{
-    init();
+ 186:	60 df       	rcall	.-320    	; 0x48 <init>
     while (1) 
     {
 		if(check_battery() == 'y') {
- 15a:	92 df       	rcall	.-220    	; 0x80 <check_battery>
- 15c:	89 37       	cpi	r24, 0x79	; 121
- 15e:	09 f0       	breq	.+2      	; 0x162 <main+0x10>
- 160:	46 c0       	rjmp	.+140    	; 0x1ee <main+0x9c>
-			timeout = 0;
- 162:	10 92 7f 00 	sts	0x007F, r1	; 0x80007f <timeout+0x1>
- 166:	10 92 7e 00 	sts	0x007E, r1	; 0x80007e <timeout>
+ 188:	8e df       	rcall	.-228    	; 0xa6 <check_battery>
+ 18a:	89 37       	cpi	r24, 0x79	; 121
+ 18c:	09 f0       	breq	.+2      	; 0x190 <main+0xa>
+ 18e:	4a c0       	rjmp	.+148    	; 0x224 <main+0x9e>
 			TCCR0B |= _BV(CS02)|_BV(CS00); // set prescaler to 1024 (CLK=1200000Hz/1024/256=4Hz, 0.25s)
- 16a:	83 b7       	in	r24, 0x33	; 51
- 16c:	85 60       	ori	r24, 0x05	; 5
- 16e:	83 bf       	out	0x33, r24	; 51
+ 190:	83 b7       	in	r24, 0x33	; 51
+ 192:	85 60       	ori	r24, 0x05	; 5
+ 194:	83 bf       	out	0x33, r24	; 51
 			TIMSK0 |= _BV(TOIE0); // enable Timer Overflow interrupt
- 170:	89 b7       	in	r24, 0x39	; 57
- 172:	82 60       	ori	r24, 0x02	; 2
- 174:	89 bf       	out	0x39, r24	; 57
+ 196:	89 b7       	in	r24, 0x39	; 57
+ 198:	82 60       	ori	r24, 0x02	; 2
+ 19a:	89 bf       	out	0x39, r24	; 57
 			sei(); // enable global interrupts
- 176:	78 94       	sei
-			while(counter<=500){
- 178:	80 91 80 00 	lds	r24, 0x0080	; 0x800080 <counter>
- 17c:	90 91 81 00 	lds	r25, 0x0081	; 0x800081 <counter+0x1>
- 180:	85 3f       	cpi	r24, 0xF5	; 245
- 182:	91 40       	sbci	r25, 0x01	; 1
- 184:	7c f5       	brge	.+94     	; 0x1e4 <main+0x92>
+ 19c:	78 94       	sei
+			while(counter<=50000){
 				PORTB = 0x02; //enable HC12
- 186:	18 bb       	out	0x18, r17	; 24
+ 19e:	12 e0       	ldi	r17, 0x02	; 2
+					if( !(PINB & (1<<2)) ) {
+						_delay_ms(250); // wait until before new complete message
+						HC12_read(); 
+						/*if (message == key) {
+							if (action == 0x01) {*/
+								PORTB = 0b00001000; // PB3 ON = power switch and HC12 off
+ 1a0:	08 e0       	ldi	r16, 0x08	; 8
+ 1a2:	ce e7       	ldi	r28, 0x7E	; 126
+ 1a4:	d0 e0       	ldi	r29, 0x00	; 0
+		if(check_battery() == 'y') {
+			TCCR0B |= _BV(CS02)|_BV(CS00); // set prescaler to 1024 (CLK=1200000Hz/1024/256=4Hz, 0.25s)
+			TIMSK0 |= _BV(TOIE0); // enable Timer Overflow interrupt
+			sei(); // enable global interrupts
+			while(counter<=50000){
+				PORTB = 0x02; //enable HC12
+ 1a6:	18 bb       	out	0x18, r17	; 24
 	#else
 		//round up by default
 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
 	#endif
 
 	__builtin_avr_delay_cycles(__ticks_dc);
- 188:	8b e2       	ldi	r24, 0x2B	; 43
- 18a:	91 e0       	ldi	r25, 0x01	; 1
- 18c:	01 97       	sbiw	r24, 0x01	; 1
- 18e:	f1 f7       	brne	.-4      	; 0x18c <main+0x3a>
- 190:	00 c0       	rjmp	.+0      	; 0x192 <main+0x40>
- 192:	00 00       	nop
- 194:	12 c0       	rjmp	.+36     	; 0x1ba <main+0x68>
+ 1a8:	8b e2       	ldi	r24, 0x2B	; 43
+ 1aa:	91 e0       	ldi	r25, 0x01	; 1
+ 1ac:	01 97       	sbiw	r24, 0x01	; 1
+ 1ae:	f1 f7       	brne	.-4      	; 0x1ac <main+0x26>
+ 1b0:	00 c0       	rjmp	.+0      	; 0x1b2 <main+0x2c>
+ 1b2:	00 00       	nop
 				_delay_ms(1);
+				timeout = 0;
+ 1b4:	10 92 7f 00 	sts	0x007F, r1	; 0x80007f <timeout+0x1>
+ 1b8:	10 92 7e 00 	sts	0x007E, r1	; 0x80007e <timeout>
 				while(timeout <= 1){
+ 1bc:	1d c0       	rjmp	.+58     	; 0x1f8 <main+0x72>
 					if( !(PINB & (1<<2)) ) {
- 196:	b2 99       	sbic	0x16, 2	; 22
- 198:	14 c0       	rjmp	.+40     	; 0x1c2 <main+0x70>
- 19a:	9f e5       	ldi	r25, 0x5F	; 95
- 19c:	2a ee       	ldi	r18, 0xEA	; 234
- 19e:	80 e0       	ldi	r24, 0x00	; 0
- 1a0:	91 50       	subi	r25, 0x01	; 1
- 1a2:	20 40       	sbci	r18, 0x00	; 0
- 1a4:	80 40       	sbci	r24, 0x00	; 0
- 1a6:	e1 f7       	brne	.-8      	; 0x1a0 <main+0x4e>
- 1a8:	00 c0       	rjmp	.+0      	; 0x1aa <main+0x58>
- 1aa:	00 00       	nop
+ 1be:	b2 99       	sbic	0x16, 2	; 22
+ 1c0:	1f c0       	rjmp	.+62     	; 0x200 <main+0x7a>
+ 1c2:	9f e5       	ldi	r25, 0x5F	; 95
+ 1c4:	2a ee       	ldi	r18, 0xEA	; 234
+ 1c6:	80 e0       	ldi	r24, 0x00	; 0
+ 1c8:	91 50       	subi	r25, 0x01	; 1
+ 1ca:	20 40       	sbci	r18, 0x00	; 0
+ 1cc:	80 40       	sbci	r24, 0x00	; 0
+ 1ce:	e1 f7       	brne	.-8      	; 0x1c8 <main+0x42>
+ 1d0:	00 c0       	rjmp	.+0      	; 0x1d2 <main+0x4c>
+ 1d2:	00 00       	nop
 						_delay_ms(250); // wait until before new complete message
 						HC12_read(); 
- 1ac:	8c df       	rcall	.-232    	; 0xc6 <HC12_read>
- 1ae:	e0 e6       	ldi	r30, 0x60	; 96
- 1b0:	f0 e0       	ldi	r31, 0x00	; 0
+ 1d4:	84 df       	rcall	.-248    	; 0xde <HC12_read>
+						/*if (message == key) {
+							if (action == 0x01) {*/
+								PORTB = 0b00001000; // PB3 ON = power switch and HC12 off
+ 1d6:	08 bb       	out	0x18, r16	; 24
+ 1d8:	9f eb       	ldi	r25, 0xBF	; 191
+ 1da:	24 ed       	ldi	r18, 0xD4	; 212
+ 1dc:	81 e0       	ldi	r24, 0x01	; 1
+ 1de:	91 50       	subi	r25, 0x01	; 1
+ 1e0:	20 40       	sbci	r18, 0x00	; 0
+ 1e2:	80 40       	sbci	r24, 0x00	; 0
+ 1e4:	e1 f7       	brne	.-8      	; 0x1de <main+0x58>
+ 1e6:	00 c0       	rjmp	.+0      	; 0x1e8 <main+0x62>
+ 1e8:	00 00       	nop
+								_delay_ms(500);
+								PORTB = 0x00; // all off
+ 1ea:	18 ba       	out	0x18, r1	; 24
+ 1ec:	e0 e6       	ldi	r30, 0x60	; 96
+ 1ee:	f0 e0       	ldi	r31, 0x00	; 0
 						}
 						else { 
 							// bad key nothing to do
-						}
+						}*/
 						for(int i = 0; i < total_bytes_message; i++) { // reset of message buffer
 							message[i] = 0x00;
- 1b2:	11 92       	st	Z+, r1
+ 1f0:	11 92       	st	Z+, r1
 							}
 						}
 						else { 
 							// bad key nothing to do
-						}
+						}*/
 						for(int i = 0; i < total_bytes_message; i++) { // reset of message buffer
- 1b4:	ce 17       	cp	r28, r30
- 1b6:	df 07       	cpc	r29, r31
- 1b8:	e1 f7       	brne	.-8      	; 0x1b2 <main+0x60>
-			TIMSK0 |= _BV(TOIE0); // enable Timer Overflow interrupt
+ 1f2:	ce 17       	cp	r28, r30
+ 1f4:	df 07       	cpc	r29, r31
+ 1f6:	e1 f7       	brne	.-8      	; 0x1f0 <main+0x6a>
 			sei(); // enable global interrupts
-			while(counter<=500){
+			while(counter<=50000){
 				PORTB = 0x02; //enable HC12
 				_delay_ms(1);
+				timeout = 0;
 				while(timeout <= 1){
- 1ba:	80 91 7e 00 	lds	r24, 0x007E	; 0x80007e <timeout>
- 1be:	90 91 7f 00 	lds	r25, 0x007F	; 0x80007f <timeout+0x1>
- 1c2:	82 30       	cpi	r24, 0x02	; 2
- 1c4:	91 05       	cpc	r25, r1
- 1c6:	3c f3       	brlt	.-50     	; 0x196 <main+0x44>
+ 1f8:	80 91 7e 00 	lds	r24, 0x007E	; 0x80007e <timeout>
+ 1fc:	90 91 7f 00 	lds	r25, 0x007F	; 0x80007f <timeout+0x1>
+ 200:	82 30       	cpi	r24, 0x02	; 2
+ 202:	91 05       	cpc	r25, r1
+ 204:	e4 f2       	brlt	.-72     	; 0x1be <main+0x38>
 					}
 					else{
 						// nothing to do
 					}
 				}
 				timeout = 0;
- 1c8:	10 92 7f 00 	sts	0x007F, r1	; 0x80007f <timeout+0x1>
- 1cc:	10 92 7e 00 	sts	0x007E, r1	; 0x80007e <timeout>
+ 206:	10 92 7f 00 	sts	0x007F, r1	; 0x80007f <timeout+0x1>
+ 20a:	10 92 7e 00 	sts	0x007E, r1	; 0x80007e <timeout>
 				PORTB = 0x00; //disable HC12
- 1d0:	18 ba       	out	0x18, r1	; 24
-				go_to_sleep();
- 1d2:	49 df       	rcall	.-366    	; 0x66 <go_to_sleep>
-				go_to_sleep();
- 1d4:	48 df       	rcall	.-368    	; 0x66 <go_to_sleep>
-		if(check_battery() == 'y') {
-			timeout = 0;
-			TCCR0B |= _BV(CS02)|_BV(CS00); // set prescaler to 1024 (CLK=1200000Hz/1024/256=4Hz, 0.25s)
-			TIMSK0 |= _BV(TOIE0); // enable Timer Overflow interrupt
-			sei(); // enable global interrupts
-			while(counter<=500){
- 1d6:	80 91 80 00 	lds	r24, 0x0080	; 0x800080 <counter>
- 1da:	90 91 81 00 	lds	r25, 0x0081	; 0x800081 <counter+0x1>
- 1de:	85 3f       	cpi	r24, 0xF5	; 245
- 1e0:	91 40       	sbci	r25, 0x01	; 1
- 1e2:	8c f2       	brlt	.-94     	; 0x186 <main+0x34>
-				timeout = 0;
-				PORTB = 0x00; //disable HC12
-				go_to_sleep();
-				go_to_sleep();
+ 20e:	18 ba       	out	0x18, r1	; 24
+				counter++;
+ 210:	80 91 80 00 	lds	r24, 0x0080	; 0x800080 <counter>
+ 214:	90 91 81 00 	lds	r25, 0x0081	; 0x800081 <counter+0x1>
+ 218:	01 96       	adiw	r24, 0x01	; 1
+ 21a:	90 93 81 00 	sts	0x0081, r25	; 0x800081 <counter+0x1>
+ 21e:	80 93 80 00 	sts	0x0080, r24	; 0x800080 <counter>
+				//go_to_sleep();
+				//go_to_sleep();
 			}
+ 222:	c1 cf       	rjmp	.-126    	; 0x1a6 <main+0x20>
 			counter = 0;
- 1e4:	10 92 81 00 	sts	0x0081, r1	; 0x800081 <counter+0x1>
- 1e8:	10 92 80 00 	sts	0x0080, r1	; 0x800080 <counter>
- 1ec:	b6 cf       	rjmp	.-148    	; 0x15a <main+0x8>
 		}
 		else{
 			for(counter=0; counter<=100; counter++){ // enter in sleep for about 100*8 seconds
- 1ee:	10 92 81 00 	sts	0x0081, r1	; 0x800081 <counter+0x1>
- 1f2:	10 92 80 00 	sts	0x0080, r1	; 0x800080 <counter>
+ 224:	10 92 81 00 	sts	0x0081, r1	; 0x800081 <counter+0x1>
+ 228:	10 92 80 00 	sts	0x0080, r1	; 0x800080 <counter>
 				go_to_sleep();
- 1f6:	37 df       	rcall	.-402    	; 0x66 <go_to_sleep>
-				go_to_sleep();
+ 22c:	1c df       	rcall	.-456    	; 0x66 <go_to_sleep>
+				//go_to_sleep();
 			}
 			counter = 0;
 		}
 		else{
 			for(counter=0; counter<=100; counter++){ // enter in sleep for about 100*8 seconds
- 1f8:	80 91 80 00 	lds	r24, 0x0080	; 0x800080 <counter>
- 1fc:	90 91 81 00 	lds	r25, 0x0081	; 0x800081 <counter+0x1>
- 200:	01 96       	adiw	r24, 0x01	; 1
- 202:	90 93 81 00 	sts	0x0081, r25	; 0x800081 <counter+0x1>
- 206:	80 93 80 00 	sts	0x0080, r24	; 0x800080 <counter>
- 20a:	85 36       	cpi	r24, 0x65	; 101
- 20c:	91 05       	cpc	r25, r1
- 20e:	9c f3       	brlt	.-26     	; 0x1f6 <main+0xa4>
- 210:	a4 cf       	rjmp	.-184    	; 0x15a <main+0x8>
+ 22e:	80 91 80 00 	lds	r24, 0x0080	; 0x800080 <counter>
+ 232:	90 91 81 00 	lds	r25, 0x0081	; 0x800081 <counter+0x1>
+ 236:	01 96       	adiw	r24, 0x01	; 1
+ 238:	90 93 81 00 	sts	0x0081, r25	; 0x800081 <counter+0x1>
+ 23c:	80 93 80 00 	sts	0x0080, r24	; 0x800080 <counter>
+ 240:	85 36       	cpi	r24, 0x65	; 101
+ 242:	91 05       	cpc	r25, r1
+ 244:	9c f3       	brlt	.-26     	; 0x22c <main+0xa6>
+ 246:	a0 cf       	rjmp	.-192    	; 0x188 <main+0x2>
 
-00000212 <_exit>:
- 212:	f8 94       	cli
+00000248 <_exit>:
+ 248:	f8 94       	cli
 
-00000214 <__stop_program>:
- 214:	ff cf       	rjmp	.-2      	; 0x214 <__stop_program>
+0000024a <__stop_program>:
+ 24a:	ff cf       	rjmp	.-2      	; 0x24a <__stop_program>
