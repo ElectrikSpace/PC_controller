@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import com.android.volley.toolbox.Volley;
+import com.android.volley.RequestQueue;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,5 +34,13 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url ="http://www.google.com";
+
+    }
+
+    public void test() {
+
     }
 }

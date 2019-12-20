@@ -31,6 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
 }
+else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+  
+}
 else{
   $return["success"] = false;
   $return["error"] = "not supported method";
