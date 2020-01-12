@@ -1,9 +1,11 @@
+#!/usr/bin/env python
+
+import serial
 import flask
 from flask import request, jsonify
 import time
 import sys
 import os
-import serial
 import RPi.GPIO as GPIO
 
 def send_request(action) :
@@ -23,13 +25,13 @@ def send_request(action) :
             HC12.write(str.encode("p" + key))
         elif action == "reset" :
             HC12.write(str.encode("r" + key))
-        elif action == "batterie_level" :
+        elif action == "battery_level" :
             HC12.write(str.encode("b"))
         t0 = time.time()
         buffer = []
-        while (time.time() < t0 + 4) :
+        while (time.time() < t0 + 3) :
             for element in HC12.read():
-                buffer.append[element]
+                buffer.append(element)
         HC12.close()
         GPIO.cleanup()
         if len(buffer) == 0 :
@@ -60,19 +62,24 @@ def send_request(action) :
     return response
 
 app = flask.Flask(__name__)
-app.config['SERVER_NAME'] = "localhost:80"
+app.config['DEBUG'] = True
 
 @app.route('/PCcontroller', methods=['GET'])
 def ping():
     response = {
-        'status': 200,
+        'status': 200
     }
-    response = os.system("ping -c 1 127.0.0.0")
-    if response == 0 :
-        response['success'] = True
+    if 'API_key' in request.form and request.form['API_key'] == 'a067db7c':
+        ping = os.system("ping -c 1 192.168.1.21") # replace by PC local ip adress
+        if ping == 0 :
+            response['success'] = True
+        else :
+            response['success'] = False
     else :
+        response['status'] = 403
         response['success'] = False
-    return jsonify(reponse)
+        response['error'] = "bad API key"
+    return jsonify(response)
 
 @app.route('/PCcontroller', methods=['POST'])
 def API():
@@ -86,8 +93,9 @@ def API():
             response['success'] = False
             response['error'] = "action not defined"
     else :
+        response['status'] = 403
         response['success'] = False
         response['error'] = "bad API key"
     return jsonify(response)
 
-app.run()
+app.run(host='0.0.0.0', port=80)
