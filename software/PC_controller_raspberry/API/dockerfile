@@ -1,9 +1,0 @@
-FROM python:slim-armv6
-MAINTAINER ELectrikSpace
-WORKDIR /app
-COPY . /app
-RUN apt-get update
-RUN apt-get install -y gcc
-RUN pip install flask pyserial RPi.GPIO
-EXPOSE 80
-CMD ["python", "/app/app.py"]

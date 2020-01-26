@@ -6,51 +6,57 @@
  */ 
 #define F_CPU (1200000UL) // 1.2 MHz
 
+// dependencies
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
-#include <avr/wdt.h> //Needed to enable/disable watch dog timer
 
-#define min_batterie_level 773
-#define total_bytes_message 20
+#define total_bytes_message 20 // size of authentication key
 
-//const uint8_t key[total_bytes_message] = {0x61, 0x33, 0x35, 0x64, 0x66, 0x30, 0x32, 0x66, 0x66, 0x63, 0x34, 0x62, 0x39, 0x66, 0x61, 0x64, 0x64, 0x31, 0x62, 0x33, 0x65, 0x63, 0x39, 0x37, 0x37, 0x66, 0x63, 0x33, 0x62, 0x33};
-const uint8_t key[total_bytes_message] = {0x61, 0x33, 0x35, 0x64, 0x66, 0x30, 0x32, 0x66, 0x66, 0x63, 0x34, 0x62, 0x39, 0x66, 0x61, 0x64, 0x64, 0x31, 0x62, 0x33};
+// init variables
+const uint8_t key[total_bytes_message] = {0x61, 0x33, 0x35, 0x64, 0x66, 0x30, 0x32, 0x66, 0x66, 0x63, 0x34, 0x62, 0x39, 0x66, 0x61, 0x64, 0x64, 0x31, 0x62, 0x33}; // key written in hex
+int timeout = 0; // used by the timer
+uint8_t message[total_bytes_message]; 
+uint8_t action; 
 
-int timeout = 0;
-uint8_t message[total_bytes_message];
-uint8_t action;
-
+// timer interrupt
 ISR(TIM0_OVF_vect)
 {
 	timeout++;
 }
 
+// wake up interrupt
 ISR(INT0_vect)
 {
 	sleep_disable();
 }
 
-void init() {
+void init() { // at startup
+	// I/O
 	PORTB = 0b0000100; // outputs set to LOW and input set to h-Z
 	DDRB = 0b00011100; // set inputs and outputs
+	// ADC (battery level)
 	ADMUX = 0x00; // ADC multiplexer timer 
 	ADCSRA = 0x87; // initialize ADC status register
-	DIDR0 = 0x01;
-	_delay_ms(1); // wait until complete write
+	DIDR0 = 0x01; // disable Digital Input
+	// wait until all complete
+	_delay_ms(1);
 }
 
 void go_to_sleep() {
-	ADCSRA &= ~(1<<ADEN);
-	MCUCR &= ~(_BV(ISC01) | _BV(ISC00));      //INT0 on low level
-	GIMSK |= _BV(INT0);                       //enable INT0
+	// init
+	ADCSRA &= ~(1<<ADEN); // disable ADC to reduce consumption
+	MCUCR &= ~(_BV(ISC01) | _BV(ISC00)); // The rising edge of INT0 generates an interrupt request
+	GIMSK |= _BV(INT0); //enable INT0
+	// sleep
 	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 	sleep_enable();
 	sei();
 	sleep_cpu();
 	cli();
-	ADCSRA |= (1<<ADEN);
+	// after
+	ADCSRA |= (1<<ADEN); // enable ADC
 }
 
 void read_battery_level() {
@@ -59,10 +65,10 @@ void read_battery_level() {
 	return;
 }
 
-void HC12_write(uint8_t data) { // send a bytes other HC12
-	PORTB = 0b00000000;
-	for (int i = 0; i <= 7; i++) {
-		_delay_us(175);
+void HC12_write(uint8_t data) { // send a bytes other HC12 at 4800 bps
+	PORTB = 0b00000000; // start bit
+	for (int i = 0; i <= 7; i++) { // send all 8 bits
+		_delay_us(175); // delay at 4800 bps
 		if ( (data & (1<<i)) == 0x00 ){
 			PORTB = 0b00000000;
 		}
@@ -71,7 +77,7 @@ void HC12_write(uint8_t data) { // send a bytes other HC12
 		}
 	}
 	_delay_us(175);
-	PORTB = 0b00000100;
+	PORTB = 0b00000100; // stop bit
 	_delay_us(175);
 	return;
 }

@@ -2,21 +2,24 @@ version: '3'
 
 services:
   reverse-proxy:
-    # The official v2.0 Traefik docker image
+    # I pulled an armv6 version of traefik compatible with the RPi
     image: traefik:armv6
     # Enables the web UI and tells Traefik to listen to docker
     command: --api.insecure=true --providers.docker
     ports:
       # The HTTP port
       - "80:80"
-      # The Web UI (enabled by --api.insecure=true)
+      # The Web UI of Traefik (enabled by --api.insecure=true)
       - "8080:8080"
     volumes:
       # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock
 
   app:
-    image: pc_controller_backend:v1-armv6
+    # replace by your built image
+    image: pc_controller_backend:armv6
+    # must be privileged to use GPIO and Serial (easiest way)
     privileged: true
+    # link to domain with Traefik
     labels:
       - "traefik.http.routers.app.rule=Host(`api.snoiry.com`) && Path(`/PCcontroller`)"

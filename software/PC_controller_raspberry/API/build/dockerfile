@@ -1,0 +1,24 @@
+# I pulled an armv6 version of python:slim compatible with the RPi
+FROM python:slim-armv6
+
+# https://github.com/ElectrikSpace/PC_controller
+MAINTAINER ELectrikSpace
+
+RUN apt-get update
+
+# install dependancies
+RUN apt-get install -y gcc
+RUN apt-get install -y iputils-ping
+
+# install python dependancies
+RUN pip install flask pyserial RPi.GPIO
+
+# copy python file
+WORKDIR /app
+COPY . /app
+
+# port 80 used for the App
+EXPOSE 80
+
+# launch the App
+CMD ["python", "/app/app.py"]
