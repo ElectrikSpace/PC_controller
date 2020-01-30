@@ -14,12 +14,14 @@ services:
     volumes:
       # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
 
   app:
     # replace by your built image
-    image: pc_controller_backend:armv6
+    image: pc_controller_backend:1.1-armv6
     # must be privileged to use GPIO and Serial (easiest way)
     privileged: true
     # link to domain with Traefik
     labels:
       - "traefik.http.routers.app.rule=Host(`api.snoiry.com`) && Path(`/PCcontroller`)"
+    restart: always

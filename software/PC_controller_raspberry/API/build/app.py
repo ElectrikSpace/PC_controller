@@ -53,7 +53,13 @@ def send_request(action) : # communication to micro-controller
                 # 2 bytes must be received
                 try:
                     response["success"] = True
-                    response["value"] = buffer[1]*256 + buffer[2]
+                    battery_value = buffer[1]*256 + buffer[2]
+                    if battery_value >= 975 :
+                        response["value"] = 100
+                    elif battery_value <= 750 :
+                        response["value"] = 0
+                    else :
+                        response["value"] = ( battery_value - 750) // 2.24
                 except:
                     response["success"] = False
                     response["error"] = "invalid reponse"
