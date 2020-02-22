@@ -18,7 +18,7 @@ services:
 
   app:
     # replace by your built image
-    image: pc_controller_backend:1.1-armv6
+    image: pc_controller_backend:1.2-armv6
     # must be privileged to use GPIO and Serial (easiest way)
     privileged: true
     # link to domain with Traefik
