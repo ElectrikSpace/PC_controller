@@ -84,11 +84,10 @@ app.config['DEBUG'] = False # change to True for debug, but need more CPU
 # GET method : check if PC is ready with a ping
 @app.route('/PCcontroller', methods=['GET'])
 def API_get():
-    content = request.get_json()
     response = { # HTTP status OK
         'status': 200,
     }
-    if 'API_key' in content and content['API_key'] == 'a067db7c': # API authentification
+    if 'API_key' in request.args and request.args['API_key'] == 'a067db7c': # API authentification
         ping = os.system("ping -c 1 192.168.1.5") # ping with local IP
         if ping == 0 : # OK
             response['success'] = True

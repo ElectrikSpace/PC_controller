@@ -1,27 +1,23 @@
 version: '3'
 
 services:
-  reverse-proxy:
-    # I pulled an armv6 version of traefik compatible with the RPi
-    image: traefik:armv6
-    # Enables the web UI and tells Traefik to listen to docker
-    command: --api.insecure=true --providers.docker
-    ports:
-      # The HTTP port
-      - "80:80"
-      # The Web UI of Traefik (enabled by --api.insecure=true)
-      - "8080:8080"
-    volumes:
-      # So that Traefik can listen to the Docker events
-      - /var/run/docker.sock:/var/run/docker.sock
-    restart: always
+    pccontroller-webapi:
+        # replace by your built image
+        image: pc_controller_backend:1.3-armv6
+        # must be privileged to use GPIO and Serial (easiest way)
+        privileged: true
+        # link to domain with Traefik
+        networks:
+          - traefik
+        labels:
+          #- "traefik.port=80"
+          #- "traefik.http.routers.pccontroller-webapi.rule=Host(`api.snoiry.com`) && Path(`/PCcontroller`)"
+          - "traefik.enable=true"
+          - "traefik.http.routers.pccontroller-webapi.rule=Host(`api.snoiry.com`) && Path(`/PCcontroller`)"
+          #- "traefik.http.routers.pccontroller-webapi.entrypoints=websecure"
+          #- "traefik.http.routers.pccontroller-webapi.tls.certresolver=snoiryresolver"
+        restart: always
 
-  app:
-    # replace by your built image
-    image: pc_controller_backend:1.2-armv6
-    # must be privileged to use GPIO and Serial (easiest way)
-    privileged: true
-    # link to domain with Traefik
-    labels:
-      - "traefik.http.routers.app.rule=Host(`api.snoiry.com`) && Path(`/PCcontroller`)"
-    restart: always
+networks:
+  traefik:
+    external: true
