@@ -10,12 +10,8 @@ services:
         networks:
           - traefik
         labels:
-          #- "traefik.port=80"
-          #- "traefik.http.routers.pccontroller-webapi.rule=Host(`api.snoiry.com`) && Path(`/PCcontroller`)"
           - "traefik.enable=true"
           - "traefik.http.routers.pccontroller-webapi.rule=Host(`api.snoiry.com`) && Path(`/PCcontroller`)"
-          #- "traefik.http.routers.pccontroller-webapi.entrypoints=websecure"
-          #- "traefik.http.routers.pccontroller-webapi.tls.certresolver=snoiryresolver"
         restart: always
 
 networks:
