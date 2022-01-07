@@ -427,20 +427,20 @@ END GROUP
  .debug_abbrev  0x00000000      0x2b6 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATtiny_DFP/1.3.229/gcc/dev/attiny13a/avr25/tiny-stack/crtattiny13a.o
  .debug_abbrev  0x000002b6      0x210 main.o
 
-.debug_line     0x00000000      0x57d
+.debug_line     0x00000000      0x57e
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000       0xca C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATtiny_DFP/1.3.229/gcc/dev/attiny13a/avr25/tiny-stack/crtattiny13a.o
- .debug_line    0x000000ca      0x4b3 main.o
+ .debug_line    0x000000ca      0x4b4 main.o
 
 .debug_frame    0x00000000       0xd8
  *(.debug_frame)
  .debug_frame   0x00000000       0xd8 main.o
 
-.debug_str      0x00000000      0x34c
+.debug_str      0x00000000      0x353
  *(.debug_str)
  .debug_str     0x00000000      0x100 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATtiny_DFP/1.3.229/gcc/dev/attiny13a/avr25/tiny-stack/crtattiny13a.o
- .debug_str     0x00000100      0x24c main.o
-                                0x280 (size before relaxing)
+ .debug_str     0x00000100      0x253 main.o
+                                0x287 (size before relaxing)
 
 .debug_loc      0x00000000      0x7a3
  *(.debug_loc)

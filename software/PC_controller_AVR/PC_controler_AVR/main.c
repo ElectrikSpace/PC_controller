@@ -62,7 +62,7 @@ void go_to_sleep() {
 void read_battery_level() {
 	ADCSRA |= (1 << ADSC); // start conversion
 	while(ADCSRA & (1 << ADSC)); // wait until complete
-	return;
+	//return;
 }
 
 void HC12_write(uint8_t data) { // send a bytes other HC12 at 4800 bps

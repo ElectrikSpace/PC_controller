@@ -19,15 +19,15 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   7 .debug_abbrev 000004c6  00000000  00000000  00000f45  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   0000057d  00000000  00000000  0000140b  2**0
+  8 .debug_line   0000057e  00000000  00000000  0000140b  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  000000d8  00000000  00000000  00001988  2**2
+  9 .debug_frame  000000d8  00000000  00000000  0000198c  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    0000034c  00000000  00000000  00001a60  2**0
+ 10 .debug_str    00000353  00000000  00000000  00001a64  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    000007a3  00000000  00000000  00001dac  2**0
+ 11 .debug_loc    000007a3  00000000  00000000  00001db7  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 000000b0  00000000  00000000  0000254f  2**0
+ 12 .debug_ranges 000000b0  00000000  00000000  0000255a  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -83,10 +83,10 @@ Disassembly of section .text:
   46:	dc cf       	rjmp	.-72     	; 0x0 <__vectors>
 
 00000048 <__vector_3>:
-int timeout = 0;
-uint8_t message[total_bytes_message];
-uint8_t action;
+uint8_t message[total_bytes_message]; 
+uint8_t action; 
 
+// timer interrupt
 ISR(TIM0_OVF_vect)
 {
   48:	1f 92       	push	r1
@@ -113,6 +113,7 @@ ISR(TIM0_OVF_vect)
 
 00000076 <__vector_1>:
 
+// wake up interrupt
 ISR(INT0_vect)
 {
   76:	1f 92       	push	r1
@@ -135,19 +136,21 @@ ISR(INT0_vect)
 
 00000094 <init>:
 
-void init() {
+void init() { // at startup
+	// I/O
 	PORTB = 0b0000100; // outputs set to LOW and input set to h-Z
   94:	84 e0       	ldi	r24, 0x04	; 4
   96:	88 bb       	out	0x18, r24	; 24
 	DDRB = 0b00011100; // set inputs and outputs
   98:	8c e1       	ldi	r24, 0x1C	; 28
   9a:	87 bb       	out	0x17, r24	; 23
+	// ADC (battery level)
 	ADMUX = 0x00; // ADC multiplexer timer 
   9c:	17 b8       	out	0x07, r1	; 7
 	ADCSRA = 0x87; // initialize ADC status register
   9e:	87 e8       	ldi	r24, 0x87	; 135
   a0:	86 b9       	out	0x06, r24	; 6
-	DIDR0 = 0x01;
+	DIDR0 = 0x01; // disable Digital Input
   a2:	81 e0       	ldi	r24, 0x01	; 1
   a4:	84 bb       	out	0x14, r24	; 20
 	#else
@@ -165,20 +168,22 @@ void init() {
   b2:	08 95       	ret
 
 000000b4 <go_to_sleep>:
-	_delay_ms(1); // wait until complete write
+	_delay_ms(1);
 }
 
 void go_to_sleep() {
-	ADCSRA &= ~(1<<ADEN);
+	// init
+	ADCSRA &= ~(1<<ADEN); // disable ADC to reduce consumption
   b4:	37 98       	cbi	0x06, 7	; 6
-	MCUCR &= ~(_BV(ISC01) | _BV(ISC00));      //INT0 on low level
+	MCUCR &= ~(_BV(ISC01) | _BV(ISC00)); // The rising edge of INT0 generates an interrupt request
   b6:	85 b7       	in	r24, 0x35	; 53
   b8:	8c 7f       	andi	r24, 0xFC	; 252
   ba:	85 bf       	out	0x35, r24	; 53
-	GIMSK |= _BV(INT0);                       //enable INT0
+	GIMSK |= _BV(INT0); //enable INT0
   bc:	8b b7       	in	r24, 0x3b	; 59
   be:	80 64       	ori	r24, 0x40	; 64
   c0:	8b bf       	out	0x3b, r24	; 59
+	// sleep
 	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
   c2:	85 b7       	in	r24, 0x35	; 53
   c4:	87 7e       	andi	r24, 0xE7	; 231
@@ -194,7 +199,8 @@ void go_to_sleep() {
   d2:	88 95       	sleep
 	cli();
   d4:	f8 94       	cli
-	ADCSRA |= (1<<ADEN);
+	// after
+	ADCSRA |= (1<<ADEN); // enable ADC
   d6:	37 9a       	sbi	0x06, 7	; 6
   d8:	08 95       	ret
 
@@ -207,19 +213,19 @@ void read_battery_level() {
 	while(ADCSRA & (1 << ADSC)); // wait until complete
   dc:	36 99       	sbic	0x06, 6	; 6
   de:	fe cf       	rjmp	.-4      	; 0xdc <read_battery_level+0x2>
-	return;
+	//return;
 }
   e0:	08 95       	ret
 
 000000e2 <HC12_write>:
 
-void HC12_write(uint8_t data) { // send a bytes other HC12
-	PORTB = 0b00000000;
+void HC12_write(uint8_t data) { // send a bytes other HC12 at 4800 bps
+	PORTB = 0b00000000; // start bit
   e2:	18 ba       	out	0x18, r1	; 24
-	for (int i = 0; i <= 7; i++) {
+	for (int i = 0; i <= 7; i++) { // send all 8 bits
   e4:	20 e0       	ldi	r18, 0x00	; 0
   e6:	30 e0       	ldi	r19, 0x00	; 0
-		_delay_us(175);
+		_delay_us(175); // delay at 4800 bps
 		if ( (data & (1<<i)) == 0x00 ){
   e8:	90 e0       	ldi	r25, 0x00	; 0
 			PORTB = 0b00000000;
@@ -238,10 +244,10 @@ void HC12_write(uint8_t data) { // send a bytes other HC12
   f0:	f1 f7       	brne	.-4      	; 0xee <HC12_write+0xc>
   f2:	00 00       	nop
 
-void HC12_write(uint8_t data) { // send a bytes other HC12
-	PORTB = 0b00000000;
-	for (int i = 0; i <= 7; i++) {
-		_delay_us(175);
+void HC12_write(uint8_t data) { // send a bytes other HC12 at 4800 bps
+	PORTB = 0b00000000; // start bit
+	for (int i = 0; i <= 7; i++) { // send all 8 bits
+		_delay_us(175); // delay at 4800 bps
 		if ( (data & (1<<i)) == 0x00 ){
   f4:	ac 01       	movw	r20, r24
   f6:	02 2e       	mov	r0, r18
@@ -259,12 +265,12 @@ void HC12_write(uint8_t data) { // send a bytes other HC12
 		else {
 			PORTB = 0b00000100;
  10a:	68 bb       	out	0x18, r22	; 24
-	return;
+	//return;
 }
 
-void HC12_write(uint8_t data) { // send a bytes other HC12
-	PORTB = 0b00000000;
-	for (int i = 0; i <= 7; i++) {
+void HC12_write(uint8_t data) { // send a bytes other HC12 at 4800 bps
+	PORTB = 0b00000000; // start bit
+	for (int i = 0; i <= 7; i++) { // send all 8 bits
  10c:	2f 5f       	subi	r18, 0xFF	; 255
  10e:	3f 4f       	sbci	r19, 0xFF	; 255
  110:	28 30       	cpi	r18, 0x08	; 8
@@ -279,7 +285,7 @@ void HC12_write(uint8_t data) { // send a bytes other HC12
 		}
 	}
 	_delay_us(175);
-	PORTB = 0b00000100;
+	PORTB = 0b00000100; // stop bit
  11e:	84 e0       	ldi	r24, 0x04	; 4
  120:	88 bb       	out	0x18, r24	; 24
  122:	46 e4       	ldi	r20, 0x46	; 70
